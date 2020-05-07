@@ -1,4 +1,5 @@
 Source_Sans_Pro/*
+*.ttf
 *credentials.json
 *token.pickle
 *API.txt
