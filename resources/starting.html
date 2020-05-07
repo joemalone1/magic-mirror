@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>MagicMirror²</title>
+	<meta name="google" content="notranslate" />
+	<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black">
+	<meta name="format-detection" content="telephone=no">
+	<meta name="mobile-web-app-capable" content="yes">
+
+	<link rel="icon" href="data:;base64,iVBORw0KGgo=">
+	<link rel="stylesheet" type="text/css" href="css/main.css">
+	<!-- custom.css is loaded by the loader.js to make sure it's loaded after the module css files. -->
+
+	<script type="text/javascript">
+		var chores = {{ data.chores|tojson }}
+		var evening_routine = {{ data.evening_routine|tojson }}
+		var morning_routine = {{ data.morning_routine|tojson }}
+		var daily_reminders = {{ data.daily_reminders|tojson }}
+		var background = {{ data.background|tojson }}
+	</script>
+</head>
+<body>
+	<div class="region fullscreen below"><div class="container"></div></div>
+	<div class="region top bar">
+		<div class="container"></div>
+		<div class="region top left"><div class="container">
+			<h1 id="time"></h1>
+			<p id="date"></p>
+			{% for time, summary in data.events %}
+				{% if time %}
+					<p class="event">{{ time }} - {{ summary }}</p>
+				{% else %}
+					<p class="event">{{ summary }}</p>
+				{% endif %}
+			{% endfor %}
+		</div></div>
+		<div class="region top center"><div class="container"></div></div>
+		<div class="region top right"><div class="container">
+			<h1 id="cur_weather">{{ data.cur_weather.temp }}° </h1><img class="icon" src="{{ data.cur_weather.icon }}"/>
+			{% for hour_info in data.hourly_weather %}
+			<p> {{ hour_info.time }} {{ hour_info.temp }}° <img class="icon" src="{{ hour_info.icon }}"/></p>
+			{% endfor %}
+		</div></div>
+	</div>
+	<div class="region upper third"><div class="container">
+		<div class="region top left"><div class="container">
+		</div></div>
+	</div></div>
+	<div class="region middle center"><div class="container"></div></div>
+	<div class="region lower third"><div class="container">
+		<div class="region lower left"><div class="container">
+			{% for chore in data.chores %}
+			<div><input type="checkbox" style="visibility: hidden;" name="{{ chore }}"> <label class="chore-label" for="{{ chore }}">{{ chore }}</label></div>
+			{% endfor %}
+
+			<div><button class="btn btn-success" onclick="window.open('{{ data.workout_location }}','_blank')">Work Out</button></div>
+		</div></div>
+	</div></div>
+	<div class="region bottom bar">
+		<div class="container"></div>
+		<div class="region bottom left"><div class="container"></div></div>
+		<div class="region bottom center"><div class="container">
+			<p id="daily_reminder"></p>
+		</div></div>
+		<div class="region bottom right"><div class="container"></div></div>
+	</div>
+	<div class="region fullscreen above"><div class="container"></div></div>
+	<script type="text/javascript" src="js/main.js"></script>
+</body>
+</html>
