@@ -1,0 +1,4 @@
+			<h1 id="cur_weather">{{ data.cur_weather.temp }}° </h1><img class="icon" style="position: relative; top: -20px;" src="{{ data.cur_weather.icon }}"/>
+			{% for hour_info in data.hourly_weather %}
+			<p> {{ hour_info.time }} {{ hour_info.temp }}° <img class="icon" src="{{ hour_info.icon }}"/></p>
+			{% endfor %}

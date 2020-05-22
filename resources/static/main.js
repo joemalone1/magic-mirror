@@ -1,23 +1,61 @@
 var reminderIdx = 0;
+var background = null;
+var bkg_height = 1440;
+var bkg_width = 2560;
 
 window.onload = function() {
-    setBackground(background)
+	updateBackground()
     setReminder(daily_reminders[0])
     setTime()
     setInterval(setTime, 5000)
-    setInterval(changeReminder, 5000)
+    setInterval(changeReminder, 20000)
+    setInterval(updateWeather, 600000)
+    setInterval(updateBackground, 600000)
 }
-
-// TODO: Call setReminder on a timer to rotate among all daily reminders
 
 function setBackground(background) {
 	var backDiv = document.getElementsByClassName("below")
     var bkgdImg = document.createElement("img")
 
-    bkgdImg.setAttribute("src", background)
-    bkgdImg.style.opacity = 0.3
-    bkgdImg.style.width = 100%
+    bkgdImg.setAttribute("src", background);
+    bkgdImg.setAttribute("id", "back_img");
+    bkgdImg.style.opacity = 0.3;
+    backDiv[0].removeChild(backDiv[0].lastElementChild)
     backDiv[0].appendChild(bkgdImg)
+}
+
+function resizeBackground() {
+	var bkgdImg = document.getElementById("back_img");
+
+	var wOverH = bkgdImg.naturalWidth / bkgdImg.naturalHeight;
+    if (bkgdImg.width < bkg_width) {
+ 	  	bkgdImg.width = bkg_width;
+ 	  	bkgdImg.height = bkg_width / wOverH; 	
+    }
+	if (bkgdImg.height < bkg_height) {
+    	bkgdImg.height = bkg_height;
+    	bkgdImg.width = bkg_height * wOverH;
+    }
+}
+
+function updateBackground() {
+	// get our new background url
+	background = fetch('http://localhost:5000/get_background').then(function (response) {
+							if (response.ok) {
+								return response.json();
+							} else {
+								return Promise.reject(response);
+							}
+						}).then(function (data) {
+							// call setBackground with the data
+							setBackground(data);
+						}).catch(function (err) {
+							console.warn(err);
+						});
+
+	// if the background isn't big enough, zoom in until it is
+	setTimeout(resizeBackground, 500);
+
 }
 
 function setReminder(reminder) {
@@ -65,4 +103,30 @@ function setTime() {
 	var date = dayMap[today.getDay()] + ", " + monthMap[today.getMonth()] + " " + today.getDate();
 	document.getElementById("time").textContent = time;
 	document.getElementById("date").textContent = date;
+}
+
+function updateWeather() {
+	var weather_section = document.getElementById("weather_section");
+	var weather_info = fetch('http://localhost:5000/get_weather').then(function (response) {
+							if (response.ok) {
+								return response.json();
+							} else {
+								return Promise.reject(response);
+							}
+						}).then(function (data) {
+							weather_section.innerHTML = data;
+						}).catch(function (err) {
+							console.warn(err);
+						});
+
+	return weather_info;
+}
+
+function toggleStrikethrough(thisElem) {
+	if (thisElem.style.textDecoration == "line-through") {
+		thisElem.style.textDecoration = "none";
+	} else {
+		thisElem.style.textDecoration = "line-through";
+	}
+	console.log("triggered");
 }

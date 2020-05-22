@@ -10,6 +10,7 @@ from random import randrange
 from flask import Flask, send_file, render_template
 import datetime
 import requests
+import json
 
 framingham_lat = "42.27"
 framingham_lon = "-71.41"
@@ -37,14 +38,17 @@ def get_API_keys():
 def KtoF(kelvin_temp):
     return (kelvin_temp - 273.15) * (9.0/5) + 32
 
+@app.route("/get_background")
 def get_new_background_url():
+    if Pexel_API == "":
+        get_API_keys()
     # Based off API documentation at https://www.pexels.com/api/documentation/
     pexel_url = "https://api.pexels.com/v1/search?query=Mountains&per_page=1&page=" + str(randrange(1000))
     pexel_auth = {"Authorization" : Pexel_API}
 
     pexel = requests.get(pexel_url, headers=pexel_auth)
     pexel_resp = pexel.json()
-    return pexel_resp['photos'][0]['src']['large2x']
+    return json.dumps(pexel_resp['photos'][0]['src']['large2x'])
 
 def get_weather_icon(icon_str):
     return "http://openweathermap.org/img/wn/{}.png".format(icon_str)
@@ -189,12 +193,10 @@ def main():
         "morning_routine" : get_routine(service, "morning"),
         "daily_reminders" : get_routine(service, "daily"),
         "events" : get_daily_events(cal_service),
-        "background" : get_new_background_url(),
         "cur_weather" : weather_data[0],
         "hourly_weather" : weather_data[1:13:3],
         "workout_location" : get_workout_url()
     }
-    # TODO: Add day at a glance with Google calendar integration
 
     return render_template('starting.html', data=data)
 
@@ -209,6 +211,15 @@ def get_js():
 @app.route("/css/fonts/SSP.ttf")
 def get_SSP_font():
     return app.send_static_file('Source_Sans_Pro/SourceSansPro-ExtraLight.ttf')
+
+@app.route("/get_weather")
+def get_weather_section():
+    hourly_weather = get_hourly_weather(framingham_lat, framingham_lon)
+    data = {
+        "cur_weather" : hourly_weather[0],
+        "hourly_weather" : hourly_weather[1:13:3]
+    }
+    return json.dumps(render_template('weather_section.html', data=data))
 
 if __name__ == '__main__':
     app.run(debug=True)

@@ -19,14 +19,13 @@
 		var evening_routine = {{ data.evening_routine|tojson }}
 		var morning_routine = {{ data.morning_routine|tojson }}
 		var daily_reminders = {{ data.daily_reminders|tojson }}
-		var background = {{ data.background|tojson }}
 	</script>
 </head>
 <body>
-	<div class="region fullscreen below"><div class="container"></div></div>
+	<div class="region fullscreen below"><div class="container"><div class="img"></div></div></div>
 	<div class="region top bar">
 		<div class="container"></div>
-		<div class="region top left"><div class="container">
+		<div class="region top left"><div class="container populated">
 			<h1 id="time"></h1>
 			<p id="date"></p>
 			{% for time, summary in data.events %}
@@ -38,8 +37,8 @@
 			{% endfor %}
 		</div></div>
 		<div class="region top center"><div class="container"></div></div>
-		<div class="region top right"><div class="container">
-			<h1 id="cur_weather">{{ data.cur_weather.temp }}° </h1><img class="icon" src="{{ data.cur_weather.icon }}"/>
+		<div class="region top right"><div class="container populated" id="weather_section">
+			<h1 id="cur_weather">{{ data.cur_weather.temp }}° </h1><img class="icon" style="position: relative; top: -20px;" src="{{ data.cur_weather.icon }}"/>
 			{% for hour_info in data.hourly_weather %}
 			<p> {{ hour_info.time }} {{ hour_info.temp }}° <img class="icon" src="{{ hour_info.icon }}"/></p>
 			{% endfor %}
@@ -51,9 +50,9 @@
 	</div></div>
 	<div class="region middle center"><div class="container"></div></div>
 	<div class="region lower third"><div class="container">
-		<div class="region lower left"><div class="container">
+		<div class="region lower left"><div class="container populated">
 			{% for chore in data.chores %}
-			<div><input type="checkbox" style="visibility: hidden;" name="{{ chore }}"> <label class="chore-label" for="{{ chore }}">{{ chore }}</label></div>
+			<div class="chore_label" onclick="toggleStrikethrough(this);">{{ chore }}</div>
 			{% endfor %}
 
 			<div><button class="btn btn-success" onclick="window.open('{{ data.workout_location }}','_blank')">Work Out</button></div>
